@@ -188,7 +188,12 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
             if (!mBTAdapter.isEnabled()) {
-                Toast.makeText(getBaseContext(), getString(R.string.BTnotOn), Toast.LENGTH_SHORT).show();
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(getApplicationContext(), getString(R.string.BTnotOn), Toast.LENGTH_SHORT).show();
+                    }
+                });
                 return;
             }
 
@@ -203,11 +208,14 @@ public class MainActivity extends AppCompatActivity {
 
                     BluetoothDevice device = mBTAdapter.getRemoteDevice(address);
 
+                    runOnUiThread(() -> Toast.makeText(getApplicationContext(), "getString(R.string.sConn)" + name, Toast.LENGTH_SHORT).show());
+
                     try {
                         mBTSocket = createBluetoothSocket(device);
+
                     } catch (IOException e) {
                         fail = true;
-                        Toast.makeText(getBaseContext(), getString(R.string.ErrSockCrea), Toast.LENGTH_SHORT).show();
+                        runOnUiThread(() -> Toast.makeText(getApplicationContext(), getString(R.string.ErrSockCrea), Toast.LENGTH_SHORT).show());
                     }
 
                     try {
@@ -219,18 +227,21 @@ public class MainActivity extends AppCompatActivity {
                             mHandler.obtainMessage(CONNECTING_STATUS, -1, -1)
                                     .sendToTarget();
                         } catch (IOException e2) {
-                            Toast.makeText(getBaseContext(), getString(R.string.ErrSockCrea), Toast.LENGTH_SHORT).show();
+                            runOnUiThread(() -> Toast.makeText(getApplicationContext(), getString(R.string.ErrSockCrea), Toast.LENGTH_SHORT).show());
                         }
                     }
 
                     if (!fail) {
+                        // Make Toast to check if the connection was successful
+                        runOnUiThread(() -> Toast.makeText(getApplicationContext(), "Connection successful to: " + name, Toast.LENGTH_SHORT).show());
+
                         mConnectedThread = new ConnectedThread(mBTSocket, mHandler);
                         mConnectedThread.start();
 
                         mHandler.obtainMessage(CONNECTING_STATUS, 1, -1, name)
                                 .sendToTarget();
 
-                        // Starte die BluetoothTerminalActivity und übergebe Geräteinformationen
+                        // Start the BluetoothTerminalActivity and pass device information
                         Intent intent = new Intent(MainActivity.this, BluetoothTerminalActivity.class);
                         intent.putExtra("device_name", name);
                         intent.putExtra("device_address", address);
@@ -239,6 +250,7 @@ public class MainActivity extends AppCompatActivity {
                 }
             }.start();
         }
+
     };
 
     private BluetoothSocket createBluetoothSocket(BluetoothDevice device) throws IOException {

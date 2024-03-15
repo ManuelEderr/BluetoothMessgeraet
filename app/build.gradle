@@ -19,6 +19,7 @@ android {
     lint {
         abortOnError false
     }
+    namespace 'com.mcuhq.simplebluetooth'
 }
 
 dependencies {

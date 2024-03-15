@@ -8,6 +8,8 @@ public class BluetoothTerminalActivity extends AppCompatActivity {
 
     private TextView mReceivedDataTextView;
 
+    BluetoothCommunicationService bluetoothCommunicationService = new BluetoothCommunicationService(this);
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -30,22 +32,36 @@ public class BluetoothTerminalActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        // Start listening for data from the connected Bluetooth device
-        // You need to implement this part based on your Bluetooth communication logic
+        bluetoothCommunicationService.setOnDataReceivedListener(this::updateReceivedData);
+        bluetoothCommunicationService.startListeningForData();
     }
+
 
     // Override onPause to stop listening for data when the activity is paused
     @Override
     protected void onPause() {
         super.onPause();
         // Stop listening for data from the connected Bluetooth device
-        // You need to implement this part based on your Bluetooth communication logic
+        bluetoothCommunicationService.stopListeningForData();
     }
+
+
+
 
     // Method to update the UI with received data
     // Call this method whenever new data is received from the Bluetooth device
     private void updateReceivedData(String data) {
-        // Append the received data to the TextView
-        mReceivedDataTextView.append(data + "\n");
+        // Extract the voltage value from the received data
+        String voltageValue = data.substring(data.indexOf(":") + 2);
+
+        // Format the voltage value to show 2 decimal places
+        String formattedVoltage = String.format("%.2f", Double.parseDouble(voltageValue));
+
+        // Construct the display string with the voltage label and formatted value
+        String displayString = "Voltage: " + formattedVoltage + "V";
+
+        // Append the formatted data to the TextView
+        mReceivedDataTextView.append(displayString + "\n");
     }
+
 }
