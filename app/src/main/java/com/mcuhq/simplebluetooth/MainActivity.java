@@ -183,17 +183,11 @@ public class MainActivity extends AppCompatActivity {
         } else
             Toast.makeText(getApplicationContext(), getString(R.string.BTnotOn), Toast.LENGTH_SHORT).show();
     }
-
     private AdapterView.OnItemClickListener mDeviceClickListener = new AdapterView.OnItemClickListener() {
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
             if (!mBTAdapter.isEnabled()) {
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        Toast.makeText(getApplicationContext(), getString(R.string.BTnotOn), Toast.LENGTH_SHORT).show();
-                    }
-                });
+                runOnUiThread(() -> Toast.makeText(getApplicationContext(), getString(R.string.BTnotOn), Toast.LENGTH_SHORT).show());
                 return;
             }
 
@@ -208,7 +202,6 @@ public class MainActivity extends AppCompatActivity {
 
                     BluetoothDevice device = mBTAdapter.getRemoteDevice(address);
 
-                    runOnUiThread(() -> Toast.makeText(getApplicationContext(), "getString(R.string.sConn)" + name, Toast.LENGTH_SHORT).show());
 
                     try {
                         mBTSocket = createBluetoothSocket(device);
@@ -246,13 +239,15 @@ public class MainActivity extends AppCompatActivity {
                         intent.putExtra("device_name", name);
                         intent.putExtra("device_address", address);
                         startActivity(intent);
+
+                        // Call the startDataReceivingProcess method of BluetoothTerminalActivity
+                        //BluetoothTerminalActivity bluetoothTerminalActivity = new BluetoothTerminalActivity();
+                        //bluetoothTerminalActivity.startDataReceivingProcess(name);
                     }
                 }
             }.start();
         }
-
     };
-
     private BluetoothSocket createBluetoothSocket(BluetoothDevice device) throws IOException {
         try {
             final Method m = device.getClass().getMethod("createInsecureRfcommSocketToServiceRecord", UUID.class);

@@ -15,18 +15,31 @@ public class BluetoothTerminalActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_bluetooth_terminal);
 
-        mReceivedDataTextView = (TextView) findViewById(R.id.text_received_data_content);
-
         // Get data from intent extras
         String deviceName = getIntent().getStringExtra("device_name");
         String deviceAddress = getIntent().getStringExtra("device_address");
 
-        setTitle("Bluetooth Terminal - " + deviceName);
-
-        // Update UI with device information
-        // You can display device name, address, etc. if needed
-        // Example: mReceivedDataTextView.setText("Connected to: " + deviceName + " (" + deviceAddress + ")");
+        // Start data receiving process
+        startDataReceivingProcess(deviceName, deviceAddress);
     }
+
+    // Method to start the data receiving process
+    private void startDataReceivingProcess(String deviceName, String deviceAddress) {
+        System.out.println("Device: " + deviceName);
+        System.out.println("Device Address: " + deviceAddress);
+        // Implement your logic to start receiving data from the device
+        // You can use the deviceName parameter to identify the device
+
+        BluetoothCommunicationService bluetoothService = new BluetoothCommunicationService(this);
+
+        // Set listener to receive data from BluetoothCommunicationService
+        bluetoothService.setOnDataReceivedListener(this::updateReceivedData);
+
+        // Start listening for data
+        bluetoothService.startListeningForData();
+
+    }
+
 
     // Override onResume to start listening for data when the activity is resumed
     @Override
@@ -63,5 +76,6 @@ public class BluetoothTerminalActivity extends AppCompatActivity {
         // Append the formatted data to the TextView
         mReceivedDataTextView.append(displayString + "\n");
     }
+
 
 }
