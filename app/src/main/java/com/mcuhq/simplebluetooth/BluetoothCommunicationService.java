@@ -61,6 +61,7 @@ public class BluetoothCommunicationService {
             for (BluetoothDevice device : pairedDevices) {
                 if (device.getName().equals("HC-05")) { // Replace with your device name
                     return device;
+
                 }
             }
         }
