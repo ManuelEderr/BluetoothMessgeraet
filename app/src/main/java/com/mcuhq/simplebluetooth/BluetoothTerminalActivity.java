@@ -41,6 +41,7 @@ public class BluetoothTerminalActivity extends AppCompatActivity {
     }
 
 
+
     // Override onResume to start listening for data when the activity is resumed
     @Override
     protected void onResume() {
